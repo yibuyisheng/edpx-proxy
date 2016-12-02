@@ -1,6 +1,6 @@
 var path = require('path');
 var fs = require('fs');
-var proxy = require('../../index');
+var proxy = require('../index');
 
 exports.cli = {
     description: '' + fs.readFileSync(path.join(__dirname, 'proxy.md')),
