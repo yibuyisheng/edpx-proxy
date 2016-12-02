@@ -22,3 +22,21 @@ edp proxy --config=edp-webserver-config.js
 * backendHostName：代理到的后端服务器的 host name ；
 * pageScript：electron 应用右上角会有一个“执行脚本”的按钮，点击之后会执行该配置指定的脚本，可用于向登录表单中快速填充用户名密码；
 * defaultUrl：本地 edp-webserver 启动好之后，让系统默认浏览器跳转到的页面。
+
+配置示例：
+
+```
+var host = 'brandplus.baidu.com';
+exports.loginPage = 'http://' + host;
+exports.isLoginOk = function ({url}) {
+    return url.indexOf('index.html') + 1;
+};
+exports.backendHostName = host;
+exports.pageScript = `
+    document.getElementById('uc-common-account').value = 'username';
+    document.getElementById('ucsl-password-edit').value = 'password';
+`;
+
+const ip = require('edp-webserver/lib/util/ip');
+exports.defaultUrl = `http://${ip}:${exports.port}/entry/client.html`;
+```
