@@ -6,6 +6,8 @@ const log = require('edp-core/lib/log');
 const readline = require('readline');
 
 module.exports = function (configFilePath) {
+    log.info('config file path: ' + configFilePath);
+
     const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout
@@ -18,7 +20,9 @@ module.exports = function (configFilePath) {
             spawnLogin(configFilePath);
         }
         else {
-            edpWebserverStart(require(configFilePath));
+            let conf = require(configFilePath);
+            edpWebserverStart(conf);
+            require('open')(conf.defaultUrl || `http://${ip}:${conf.port || '8088'}/`);
         }
 
         rl.close();
