@@ -1,0 +1,20 @@
+{
+  "name": "edpx-proxy",
+  "version": "1.0.0",
+  "description": "111",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^1.4.10"
+  },
+  "dependencies": {
+    "edp-core": "^1.0.32",
+    "edp-webserver": "^1.2.8",
+    "electron": "^1.4.10",
+    "open": "0.0.5"
+  }
+}

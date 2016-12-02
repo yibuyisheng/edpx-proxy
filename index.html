@@ -1,0 +1,58 @@
+<meta charset="utf-8">
+<style type="text/css">
+    html,
+    body,
+    webview {
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+    }
+
+    #executeScript {
+        position: fixed;
+        top: 20;
+        right: 20;
+    }
+</style>
+<button id="executeScript">执行代码</button>
+<webview id="webview" disablewebsecurity></webview>
+
+<script type="text/javascript">
+    let configFilePath;
+    require('electron').remote.process.argv.forEach((val, index) => {
+      let valSplit = val.split('=');
+      if (valSplit.length === 2 && valSplit[0] === '--config') {
+        configFilePath = valSplit[1];
+      }
+    });
+
+    const conf = require(configFilePath);
+
+    webview.src = conf.loginPage;
+
+    webview.addEventListener('did-finish-load', () => {
+        let isLoginOk = require(configFilePath).isLoginOk;
+        if (isLoginOk instanceof Function) {
+            if (isLoginOk({url: webview.getURL()})) {
+                writeCookies();
+            }
+        }
+        else if (webview.getURL().indexOf('index.html') + 1) {
+            writeCookies();
+        }
+    });
+
+    executeScript.addEventListener('click', () => {
+        conf.pageScript && webview.executeJavaScript(conf.pageScript);
+    });
+
+    function writeCookies() {
+        let sessionCookies = webview.getWebContents().session.cookies;
+        sessionCookies.get({url: 'http://' + conf.backendHostName}, (error, cookies) => {
+            let cookieStr = cookies.map(cookie => `${cookie.name}=${cookie.value}`).join(' ;');
+            require('fs').writeFileSync(require('path').join(__dirname, 'cookies'), cookieStr);
+            require('electron').ipcRenderer.send('ok');
+        });
+    }
+</script>
