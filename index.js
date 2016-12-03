@@ -1,3 +1,8 @@
+/**
+ * @file index
+ * @author yibuyisheng(yibuyisheng@163.com)
+ */
+
 const {spawn} = require('child_process');
 const edpWebserverStart = require('edp-webserver/lib/start');
 const fs = require('fs');
@@ -6,6 +11,14 @@ const log = require('edp-core/lib/log');
 const readline = require('readline');
 
 module.exports = function (configFilePath) {
+    try {
+        fs.accessSync(configFilePath);
+    }
+    catch (e) {
+        log.error(`can not access ${configFilePath}\n${e.stack}`);
+        return;
+    }
+
     log.info('config file path: ' + configFilePath);
 
     const rl = readline.createInterface({
@@ -43,7 +56,10 @@ function spawnLogin(configFilePath) {
         }
     );
 
-    child.on('exit', (status) => {
+    log.info(`spawn electron child process, and the config file path is: ${configFilePath}`);
+
+    child.on('exit', status => {
+        // 登录成功
         if (status === 0) {
             let cookies = '' + fs.readFileSync(require('path').join(__dirname, 'cookies'));
             if (cookies) {
@@ -56,11 +72,18 @@ function spawnLogin(configFilePath) {
                 getEdpWebserverConfig(conf, cookies, conf.backendHostName)
             );
         }
+        // 直接关闭electron的主窗口
         else if (status === 1) {
             log.warn('close the login window directly');
             edpWebserverStart(conf);
         }
+        // 没有给electron子进程传入config file path
+        else if (status === 2) {
+            log.error('no config file path');
+            edpWebserverStart(conf);
+        }
 
+        // 打开链接
         require('open')(conf.defaultUrl || `http://${ip}:${conf.port || '8088'}/`);
     });
 }
