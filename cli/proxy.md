@@ -25,7 +25,7 @@ edp proxy --config=edp-webserver-config.js
 
 配置示例：
 
-```
+```js
 var host = 'brandplus.baidu.com';
 exports.loginPage = 'http://' + host;
 exports.isLoginOk = function ({url}) {
